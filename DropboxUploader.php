@@ -83,9 +83,8 @@ class DropboxUploader {
     
     protected function login() {
         $data = $this->request('https://www.dropbox.com/login');
-        $token = $this->extractToken($data, '/login');
         
-        $data = $this->request('https://www.dropbox.com/login', true, array('login_email'=>$this->email, 'login_password'=>$this->password, 't'=>$token));
+        $data = $this->request('https://www.dropbox.com/login', true, array('login_email'=>$this->email, 'login_password'=>$this->password));
         
         if (stripos($data, 'location: /home') === false)
             throw new Exception('Login unsuccessful.');
