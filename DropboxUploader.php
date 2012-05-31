@@ -62,21 +62,29 @@ class DropboxUploader {
         $this->caCertSourceType = self::CACERT_SOURCE_DIR;
         $this->caCertSource = $dir;
     }
-    
-    public function upload($filename, $remoteDir='/') {
-        if (!file_exists($filename) or !is_file($filename) or !is_readable($filename))
-            throw new Exception("File '$filename' does not exist or is not readable.");
-        
+
+    public function upload($source, $remoteDir='/', $remoteName=null) {
+        if (!file_exists($source) or !is_file($source) or !is_readable($source))
+            throw new Exception("File '$source' does not exist or is not readable.");
+
         if (!is_string($remoteDir))
-            throw new Exception("Remote directory must be a string, is ".gettype($remoteDir)." instead.");
+          throw new Exception("Remote directory must be a string, is ".gettype($remoteDir)." instead.");
+
+        if (is_null($remoteName)) {
+            $remoteName = $source;
+        } else if (!is_string($remoteName)) {
+            throw new Exception("Remote filename must be a string, is ".gettype($remoteDir)." instead.");
+        }
         
         if (!$this->loggedIn)
             $this->login();
         
         $data = $this->request('https://www.dropbox.com/home');
         $token = $this->extractToken($data, 'https://dl-web.dropbox.com/upload');
-        
-        $data = $this->request('https://dl-web.dropbox.com/upload', true, array('plain'=>'yes', 'file'=>'@'.$filename, 'dest'=>$remoteDir, 't'=>$token));
+
+
+        $postdata = array('plain'=>'yes', 'file'=>'@'.$source.';filename='.$remoteName, 'dest'=>$remoteDir, 't'=>$token);
+        $data = $this->request('https://dl-web.dropbox.com/upload', true, $postdata);
         if (strpos($data, 'HTTP/1.1 302 FOUND') === false)
             throw new Exception('Upload failed!');
     }
