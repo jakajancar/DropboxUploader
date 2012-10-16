@@ -68,14 +68,14 @@ class DropboxUploader {
             throw new Exception("File '$source' does not exist or is not readable.");
 
         if (!is_string($remoteDir))
-          throw new Exception("Remote directory must be a string, is ".gettype($remoteDir)." instead.");
+            throw new Exception("Remote directory must be a string, is ".gettype($remoteDir)." instead.");
 
         if (is_null($remoteName)) {
             $remoteName = $source;
         } else if (!is_string($remoteName)) {
             throw new Exception("Remote filename must be a string, is ".gettype($remoteDir)." instead.");
         }
-        
+
         if (!$this->loggedIn)
             $this->login();
         
@@ -91,9 +91,11 @@ class DropboxUploader {
     
     protected function login() {
         $data = $this->request('https://www.dropbox.com/login');
-        
-        $data = $this->request('https://www.dropbox.com/login', true, array('login_email'=>$this->email, 'login_password'=>$this->password));
-        
+        $token = $this->extractTokenFromLoginForm($data);
+
+        $postdata = array('login_email'=>$this->email, 'login_password'=>$this->password, 't'=>$token);
+        $data = $this->request('https://www.dropbox.com/login', true, $postdata);
+
         if (stripos($data, 'location: /home') === false)
             throw new Exception('Login unsuccessful.');
         
@@ -140,6 +142,13 @@ class DropboxUploader {
         curl_close($ch);
         
         return $data;
+    }
+
+    protected function extractTokenFromLoginForm($html) {
+        // <input type="hidden" name="t" value="UJygzfv9DLLCS-is7cLwgG7z" />
+        if (!preg_match('#<input type="hidden" name="t" value="([A-Za-z0-9_-]+)" />#', $html, $matches))
+            throw new Exception('Cannot extract login CSRF token.');
+        return $matches[1];
     }
 
     protected function extractToken($html, $formAction) {
