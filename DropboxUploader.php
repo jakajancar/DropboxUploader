@@ -35,12 +35,13 @@ class DropboxUploader {
     protected $caCertSource;
     protected $loggedIn = false;
     protected $cookies = array();
-    
+
     /**
      * Constructor
      *
      * @param string $email
      * @param string|null $password
+     * @throws Exception
      */
     public function __construct($email, $password) {
         // Check requirements
@@ -85,8 +86,8 @@ class DropboxUploader {
         $token = $this->extractToken($data, 'https://dl-web.dropbox.com/upload');
 
 
-        $postdata = array('plain'=>'yes', 'file'=>'@'.$source, 'dest'=>$remoteDir, 't'=>$token);
-        $data = $this->request('https://dl-web.dropbox.com/upload', true, $postdata);
+        $postData = array('plain'=>'yes', 'file'=>'@'.$source, 'dest'=>$remoteDir, 't'=>$token);
+        $data = $this->request('https://dl-web.dropbox.com/upload', true, $postData);
         if (strpos($data, 'HTTP/1.1 302 FOUND') === false)
             throw new Exception('Upload failed!');
     }
@@ -95,8 +96,8 @@ class DropboxUploader {
         $data = $this->request('https://www.dropbox.com/login');
         $token = $this->extractTokenFromLoginForm($data);
 
-        $postdata = array('login_email'=>$this->email, 'login_password'=>$this->password, 't'=>$token);
-        $data = $this->request('https://www.dropbox.com/login', true, $postdata);
+        $postData = array('login_email'=>$this->email, 'login_password'=>$this->password, 't'=>$token);
+        $data = $this->request('https://www.dropbox.com/login', true, $postData);
 
         if (stripos($data, 'location: /home') === false)
             throw new Exception('Login unsuccessful.');

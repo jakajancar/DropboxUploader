@@ -7,8 +7,8 @@ file synchronization and backup service.
 Its development was started before Dropbox released their API, and to work, it scrapes their website. So
 you can and probably should use their API now.
 
-You can use it to create a file upload form for your webpage, which uploads files to your dropbox. The `exampe.php` is
-a good start; just remove the email/password/destination fields and hardcode the respective values.
+You can use it to create a file upload form for your website, which uploads files to your dropbox. The `example.php` is
+a good start; just remove the email/password/destination fields and insert the respective values.
 
 If you have too much time on your hands, you can even create a service to offer the above to non-technical persons.
 
@@ -27,8 +27,8 @@ License
 
 Dropbox Uploader is licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
 
-Trobleshooting
---------------
+Troubleshooting
+---------------
 
 **I'm getting the following error:**
 
