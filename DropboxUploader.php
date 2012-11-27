@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  *
  * @author Jaka Jancar [jaka@kubje.org] [http://jaka.kubje.org/]
- * @version 1.1.5
+ * @version 1.1.6
  */
 class DropboxUploader {
     protected $email;
