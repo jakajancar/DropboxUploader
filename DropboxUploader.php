@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  *
  * @author Jaka Jancar [jaka@kubje.org] [http://jaka.kubje.org/]
- * @version 1.1.6
+ * @version 1.1.7
  */
 class DropboxUploader {
     protected $email;
@@ -134,8 +134,9 @@ class DropboxUploader {
         
         $data = curl_exec($ch);
         
-        if ($data === false)
-            throw new Exception('Cannot execute request: '.curl_error($ch));
+        if ($data === false) {
+            throw new Exception(sprintf('Curl error: (#%d) %s', curl_errno($ch), curl_error($ch)));
+        }
         
         // Store received cookies
         preg_match_all('/Set-Cookie: ([^=]+)=(.*?);/i', $data, $matches, PREG_SET_ORDER);
