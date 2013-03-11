@@ -104,6 +104,29 @@ class DropboxUploader {
             throw new Exception('Upload failed!');
     }
 
+    public function uploadString($string, $remoteName, $remoteDir='/') {
+        $exception = null;
+
+        $file  = tempnam(sys_get_temp_dir(), 'dbupbuffer');
+        if (!is_file($file))
+            throw new Exception("Can not create temporary file.");
+
+        $bytes = file_put_contents($file, $string);
+        if ($bytes === false) {
+            unlink($file);
+            throw new Exception("Can not write to temporary file '$file'.");
+        }
+
+        try {
+            $this->upload($file, $remoteDir, $remoteName);
+        } catch(Exception $exception) {}
+
+        unlink($file);
+
+        if ($exception)
+            throw $exception;
+    }
+
     protected function login() {
         $data = $this->request('https://www.dropbox.com/login');
         $token = $this->extractTokenFromLoginForm($data);
