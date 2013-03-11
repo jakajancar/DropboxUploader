@@ -168,17 +168,17 @@ class DropboxUploader {
         curl_setopt($ch, CURLOPT_COOKIE, $rawCookies);
 
         $data = curl_exec($ch);
+        $error = sprintf('Curl error: (#%d) %s', curl_errno($ch), curl_error($ch));
+        curl_close($ch);
 
         if ($data === false) {
-            throw new Exception(sprintf('Curl error: (#%d) %s', curl_errno($ch), curl_error($ch)));
+            throw new Exception($error);
         }
 
         // Store received cookies
         preg_match_all('/Set-Cookie: ([^=]+)=(.*?);/i', $data, $matches, PREG_SET_ORDER);
         foreach ($matches as $match)
             $this->cookies[$match[1]] = $match[2];
-
-        curl_close($ch);
 
         return $data;
     }
