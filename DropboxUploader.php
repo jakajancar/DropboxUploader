@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  *
  * @author Jaka Jancar [jaka@kubje.org] [http://jaka.kubje.org/]
- * @version 1.1.7
+ * @version 1.1.8
  */
 class DropboxUploader {
     protected $email;
@@ -35,6 +35,13 @@ class DropboxUploader {
     protected $caCertSource;
     protected $loggedIn = false;
     protected $cookies = array();
+
+    /*
+     * this uploader has a limit on filesize for uploading files
+     * @link https://www.dropbox.com/help/5/en
+     */
+    const DB_LIMIT_WEBUPLOAD = self::BYTES_OF_300MB;
+    const BYTES_OF_300MB = 314572800;
 
     /**
      * Constructor
@@ -67,6 +74,11 @@ class DropboxUploader {
     public function upload($source, $remoteDir='/', $remoteName=null) {
         if (!is_file($source) or !is_readable($source))
             throw new Exception("File '$source' does not exist or is not readable.");
+
+        $filesize = filesize($source);
+        if ($filesize < 0 or $filesize > self::DB_LIMIT_WEBUPLOAD) {
+            throw new Exception("File '$source' too large ($filesize bytes).");
+        }
 
         if (!is_string($remoteDir))
             throw new Exception("Remote directory must be a string, is ".gettype($remoteDir)." instead.");
