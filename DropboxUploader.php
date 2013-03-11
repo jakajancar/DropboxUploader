@@ -47,13 +47,17 @@ class DropboxUploader {
      * Constructor
      *
      * @param string $email
-     * @param string|null $password
+     * @param string $password
      * @throws Exception
      */
     public function __construct($email, $password) {
         // Check requirements
         if (!extension_loaded('curl'))
             throw new Exception('DropboxUploader requires the cURL extension.');
+
+        if (empty($email) || empty($password)) {
+            throw new Exception(empty($email) ? 'Email' : 'Password' . ' must not be empty.');
+        }
 
         $this->email = $email;
         $this->password = $password;
@@ -131,7 +135,11 @@ class DropboxUploader {
         $data = $this->request('https://www.dropbox.com/login');
         $token = $this->extractTokenFromLoginForm($data);
 
-        $postData = array('login_email'=>$this->email, 'login_password'=>$this->password, 't'=>$token);
+        $postData = array(
+            'login_email'    => (string) $this->email,
+            'login_password' => (string) $this->password,
+            't'              => $token
+        );
         $data = $this->request('https://www.dropbox.com/login', $postData);
 
         if (stripos($data, 'location: /home') === false)
