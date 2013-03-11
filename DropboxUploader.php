@@ -99,7 +99,7 @@ class DropboxUploader {
 
 
         $postData = array('plain'=>'yes', 'file'=>'@'.$source, 'dest'=>$remoteDir, 't'=>$token);
-        $data = $this->request('https://dl-web.dropbox.com/upload', true, $postData);
+        $data = $this->request('https://dl-web.dropbox.com/upload', $postData);
         if (strpos($data, 'HTTP/1.1 302 FOUND') === false)
             throw new Exception('Upload failed!');
     }
@@ -132,7 +132,7 @@ class DropboxUploader {
         $token = $this->extractTokenFromLoginForm($data);
 
         $postData = array('login_email'=>$this->email, 'login_password'=>$this->password, 't'=>$token);
-        $data = $this->request('https://www.dropbox.com/login', true, $postData);
+        $data = $this->request('https://www.dropbox.com/login', $postData);
 
         if (stripos($data, 'location: /home') === false)
             throw new Exception('Login unsuccessful.');
@@ -140,7 +140,7 @@ class DropboxUploader {
         $this->loggedIn = true;
     }
 
-    protected function request($url, $post=false, $postData=array()) {
+    protected function request($url, $postData=null) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
@@ -155,8 +155,8 @@ class DropboxUploader {
         }
         curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        if ($post) {
-            curl_setopt($ch, CURLOPT_POST, $post);
+        if (null !== $postData) {
+            curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         }
 
