@@ -13,14 +13,14 @@ if ($_POST) {
     try {
         if ($_FILES['file']['error'] !== UPLOAD_ERR_OK)
             throw new Exception('File was not successfully uploaded from your computer.');
-    
+
         if ($_FILES['file']['name'] === "")
             throw new Exception('File name not supplied by the browser.');
-        
+
         // Upload
         $uploader = new DropboxUploader($_POST['email'], $_POST['password']);
         $uploader->upload($_FILES['file']['tmp_name'], $_POST['destination'],  $_FILES['file']['name']);
-    
+
         echo '<span style="color: green">File successfully uploaded to your Dropbox!</span>';
     } catch(Exception $e) {
         echo '<span style="color: red">Error: ' . htmlspecialchars($e->getMessage()) . '</span>';
