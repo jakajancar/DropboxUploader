@@ -27,7 +27,7 @@ if ($_POST) {
         $label = ($e->getCode() & $uploader::FLAG_DROPBOX_GENERIC) ? 'DropboxUploader' : 'Exception';
         $error = sprintf("[%s] #%d %s", $label, $e->getCode(), $e->getMessage());
 
-        echo '<span style="color: red">Error: ' . htmlspecialchars($message) . '</span>';
+        echo '<span style="color: red">Error: ' . htmlspecialchars($error) . '</span>';
     }
 }
 ?>
