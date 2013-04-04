@@ -190,7 +190,7 @@ class DropboxUploader {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         if (NULL !== $postData) {
             curl_setopt($ch, CURLOPT_POST, TRUE);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
         }
 
         // Send cookies
