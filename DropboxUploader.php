@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  *
  * @author Jaka Jancar [jaka@kubje.org] [http://jaka.kubje.org/]
- * @version 1.1.11
+ * @version 1.1.12
  */
 class DropboxUploader {
     /**
@@ -77,7 +77,7 @@ class DropboxUploader {
             throw new Exception('DropboxUploader requires the cURL extension.', self::CODE_CURL_EXTENSION_MISSING);
 
         if (empty($email) || empty($password)) {
-            throw new Exception(empty($email) ? 'Email' : 'Password' . ' must not be empty.', self::CODE_PARAMETER_TYPE_ERROR);
+            throw new Exception((empty($email) ? 'Email' : 'Password') . ' must not be empty.', self::CODE_PARAMETER_TYPE_ERROR);
         }
 
         $this->email    = $email;
@@ -165,7 +165,7 @@ class DropboxUploader {
             'login_password' => (string) $this->password,
             't'              => $token
         );
-        $data     = $this->request(self::HTTPS_DROPBOX_COM_LOGIN, $postData);
+        $data     = $this->request(self::HTTPS_DROPBOX_COM_LOGIN, http_build_query($postData));
 
         if (stripos($data, 'location: /home') === FALSE)
             throw new Exception('Login unsuccessful.', self::CODE_LOGIN_ERROR);
@@ -173,7 +173,7 @@ class DropboxUploader {
         $this->loggedIn = TRUE;
     }
 
-    protected function request($url, array $postData = NULL) {
+    protected function request($url, $postData = NULL) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, (string) $url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
