@@ -123,7 +123,7 @@ class DropboxUploader {
         $postData = array(
             'plain' => 'yes',
             'dest'  => $remoteDir,
-            't'     => $token,
+            't'     => $token
         );
 
         # @filename API deprecated in PHP 5.5
