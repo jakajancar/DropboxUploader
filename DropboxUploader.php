@@ -122,6 +122,7 @@ class DropboxUploader {
 
         $postData = array(
             'plain' => 'yes',
+            'file'  => '@' . $source,
             'dest'  => $remoteDir,
             't'     => $token
         );
@@ -129,9 +130,6 @@ class DropboxUploader {
         # @filename API deprecated in PHP 5.5
         if (function_exists('curl_file_create')) {
             $postData['file'] = curl_file_create($source, NULL, $remoteName);
-        }
-        else {
-            $postData['file'] = '@' . $source;
         }
         
         $data     = $this->request(self::HTTPS_DROPBOX_COM_UPLOAD, $postData);
