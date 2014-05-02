@@ -117,14 +117,17 @@ class DropboxUploader {
         if (!$this->loggedIn)
             $this->login();
 
-        $data  = $this->request(self::HTTPS_DROPBOX_COM_HOME);
-        $token = $this->extractToken($data, self::HTTPS_DROPBOX_COM_UPLOAD);
+        $data       = $this->request(self::HTTPS_DROPBOX_COM_HOME);
+        $token      = $this->extractToken($data, self::HTTPS_DROPBOX_COM_UPLOAD);
+        $subjectUid = $this->extractSubjectUid($data, self::HTTPS_DROPBOX_COM_UPLOAD);
 
         $postData = array(
-            'plain' => 'yes',
-            'file'  => '@' . $source,
-            'dest'  => $remoteDir,
-            't'     => $token
+            'plain'        => 'yes',
+            'file'         => '@' . $source,
+            'dest'         => $remoteDir,
+            't'            => $token,
+            '_subject_uid' => $subjectUid,
+            'mtime'        => 0
         );
         $data     = $this->request(self::HTTPS_DROPBOX_COM_UPLOAD, $postData);
         if (strpos($data, 'HTTP/1.1 302 FOUND') === FALSE)
@@ -228,6 +231,17 @@ class DropboxUploader {
         // <input type="hidden" name="t" value="UJygzfv9DLLCS-is7cLwgG7z" />
         if (!preg_match('#<input type="hidden" name="t" value="([A-Za-z0-9_-]+)" />#', $html, $matches))
             throw new Exception('Cannot extract login CSRF token.', self::CODE_SCRAPING_LOGIN);
+        return $matches[1];
+    }
+
+    protected function extractSubjectUid($html, $formAction) {
+        // <input type="hidden" name="_subject_uid" value="00000000" />
+        $quot    = preg_quote($formAction, '/');
+        $pattern = '/<form [^>]*' . $quot
+            . '[^>]*>.*?(?:<input [^>]*name="_subject_uid" [^>]*value="(.*?)"[^>]*>).*?<\/form>/is';
+
+        if (!preg_match($pattern, $html, $matches))
+            throw new Exception("Cannot extract SubjectUid! (form action is '$formAction')", self::CODE_SCRAPING_FORM);
         return $matches[1];
     }
 
