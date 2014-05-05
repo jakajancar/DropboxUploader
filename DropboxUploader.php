@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  *
  * @author Jaka Jancar [jaka@kubje.org] [http://jaka.kubje.org/]
- * @version 1.1.12
+ * @version 1.1.14
  */
 class DropboxUploader {
     /**
@@ -110,25 +110,39 @@ class DropboxUploader {
             # intentionally left blank
         } else if (!is_string($remoteName)) {
             throw new Exception("Remote filename must be a string, is " . gettype($remoteDir) . " instead.", self::CODE_PARAMETER_TYPE_ERROR);
-        } else {
-            $source .= ';filename=' . $remoteName;
         }
 
         if (!$this->loggedIn)
             $this->login();
 
-        $data  = $this->request(self::HTTPS_DROPBOX_COM_HOME);
-        $token = $this->extractToken($data, self::HTTPS_DROPBOX_COM_UPLOAD);
+        $data       = $this->request(self::HTTPS_DROPBOX_COM_HOME);
+        $file       = $this->curlFileCreate($source, $remoteName);
+        $token      = $this->extractFormValue($data, 't');
+        $subjectUid = $this->extractFormValue($data, '_subject_uid');
 
         $postData = array(
-            'plain' => 'yes',
-            'file'  => '@' . $source,
-            'dest'  => $remoteDir,
-            't'     => $token
+            'plain'        => 'yes',
+            'file'         => $file,
+            'dest'         => $remoteDir,
+            't'            => $token,
+            '_subject_uid' => $subjectUid,
         );
+
         $data     = $this->request(self::HTTPS_DROPBOX_COM_UPLOAD, $postData);
         if (strpos($data, 'HTTP/1.1 302 FOUND') === FALSE)
             throw new Exception('Upload failed!', self::CODE_UPLOAD_ERROR);
+    }
+
+    private function curlFileCreate($source, $remoteName) {
+        if (function_exists('curl_file_create')) {
+            return curl_file_create($source, NULL, $remoteName);
+        }
+
+        if ($remoteName !== NULL) {
+            $source .= ';filename=' . $remoteName;
+        }
+
+        return '@' . $source;
     }
 
     public function uploadString($string, $remoteName, $remoteDir = '/') {
@@ -216,11 +230,15 @@ class DropboxUploader {
         return $data;
     }
 
-    protected function extractToken($html, $formAction) {
-        $quot    = preg_quote($formAction, '/');
-        $pattern = '/<form [^>]*' . $quot . '[^>]*>.*?(?:<input [^>]*name="t" [^>]*value="(.*?)"[^>]*>).*?<\/form>/is';
+    protected function extractFormValue($html, $name) {
+        $action  = self::HTTPS_DROPBOX_COM_UPLOAD;
+        $pattern = sprintf(
+            '/<form [^>]*%s[^>]*>.*?(?:<input [^>]*name="%s" [^>]*value="(.*?)"[^>]*>).*?<\/form>/is'
+            , preg_quote($action, '/')
+            , preg_quote($name, '/')
+        );
         if (!preg_match($pattern, $html, $matches))
-            throw new Exception("Cannot extract token! (form action is '$formAction')", self::CODE_SCRAPING_FORM);
+            throw new Exception(sprintf("Cannot extract '%s'! (form action is '%s')", $name, $action), self::CODE_SCRAPING_FORM);
         return $matches[1];
     }
 
