@@ -5,7 +5,7 @@ Dropbox Uploader is a PHP class which can be used to upload files to [Dropbox](h
 file synchronization and backup service.
 
 Its development was started before Dropbox released their API, and to work, it scrapes their website. So
-you can and probably should use their API now.
+you can and probably should use their API now as it is much more stable.
 
 You can use it to create a file upload form for your website, which uploads files to your dropbox. The `example.php` is
 a good start; just remove the email/password/destination fields and insert the respective values.
@@ -25,7 +25,7 @@ For a more complete usage example, see `example.php`.
 License
 -------
 
-Dropbox Uploader is licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
+Dropbox Uploader is licensed under the [MIT License (`MIT`)](http://spdx.org/licenses/MIT).
 
 Troubleshooting
 ---------------
