@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  *
  * @author Jaka Jancar [jaka@kubje.org] [http://jaka.kubje.org/]
- * @version 1.1.14
+ * @version 1.1.15
  */
 class DropboxUploader {
     /**
@@ -243,8 +243,8 @@ class DropboxUploader {
     }
 
     protected function extractTokenFromLoginForm($html) {
-        // <input type="hidden" name="t" value="UJygzfv9DLLCS-is7cLwgG7z" />
-        if (!preg_match('#<input type="hidden" name="t" value="([A-Za-z0-9_-]+)" />#', $html, $matches))
+        // , "TOKEN": "gCvxU6JVukrW0CUndRPruFvY",
+        if (!preg_match('#, "TOKEN": "([A-Za-z0-9_-]+)", #', $html, $matches))
             throw new Exception('Cannot extract login CSRF token.', self::CODE_SCRAPING_LOGIN);
         return $matches[1];
     }
