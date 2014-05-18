@@ -25,7 +25,7 @@ For a more complete usage example, see `example.php`.
 License
 -------
 
-Dropbox Uploader is licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
+Dropbox Uploader is licensed under the [MIT License (`MIT`)](http://spdx.org/licenses/MIT).
 
 Troubleshooting
 ---------------
