@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  *
  * @author Jaka Jancar <jaka@kubje.org> <http://jaka.kubje.org/>
- * @version 1.1.16
+ * @version 1.1.17
  * @license MIT <http://spdx.org/licenses/MIT>
  */
 final class DropboxUploader {
