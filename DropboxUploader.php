@@ -57,6 +57,7 @@ class DropboxUploader {
     const CODE_SCRAPING_FORM          = 0x10040801;
     const CODE_SCRAPING_LOGIN         = 0x10040802;
     const CODE_CURL_EXTENSION_MISSING = 0x10080101;
+    const CODE_GET_TOKEN_ERROR        = 0x10080102;
     protected $email;
     protected $password;
     protected $caCertSourceType = self::CACERT_SOURCE_SYSTEM;
@@ -117,14 +118,13 @@ class DropboxUploader {
 
         $data       = $this->request(self::HTTPS_DROPBOX_COM_HOME);
         $file       = $this->curlFileCreate($source, $remoteName);
-        $token      = $this->extractFormValue($data, 't');
         $subjectUid = $this->extractFormValue($data, '_subject_uid');
 
         $postData = array(
             'plain'        => 'yes',
             'file'         => $file,
             'dest'         => $remoteDir,
-            't'            => $token,
+            't'            => $this->getToken(),
             '_subject_uid' => $subjectUid,
         );
 
@@ -172,12 +172,11 @@ class DropboxUploader {
 
     protected function login() {
         $data  = $this->request(self::HTTPS_DROPBOX_COM_LOGIN);
-        $token = $this->extractTokenFromLoginForm($data);
 
         $postData = array(
             'login_email'    => (string) $this->email,
             'login_password' => (string) $this->password,
-            't'              => $token
+            't'              => $this->getToken(),
         );
         $data     = $this->request(self::HTTPS_DROPBOX_COM_LOGIN, http_build_query($postData));
 
@@ -242,11 +241,10 @@ class DropboxUploader {
         return $matches[1];
     }
 
-    protected function extractTokenFromLoginForm($html) {
-        // <input type="hidden" name="t" value="UJygzfv9DLLCS-is7cLwgG7z" />
-        if (!preg_match('#<input type="hidden" name="t" value="([A-Za-z0-9_-]+)" />#', $html, $matches))
-            throw new Exception('Cannot extract login CSRF token.', self::CODE_SCRAPING_LOGIN);
-        return $matches[1];
+    protected function getToken() {
+        if (!array_key_exists('t', $this->cookies))
+            throw new Exception('Cannot extract login CSRF token.', self::CODE_GET_TOKEN_ERROR);
+        return $this->cookies['t'];
     }
 
 }
