@@ -183,8 +183,8 @@ final class DropboxUploader {
         );
         $data     = $this->request(self::HTTPS_DROPBOX_COM_AJAX_LOGIN, http_build_query($postData));
 
-        if (stripos($data, 'location: /home') === FALSE)
-            throw new Exception('Login unsuccessful.', self::CODE_LOGIN_ERROR);
+        //if (stripos($data, 'location: /home') === FALSE)
+        //    throw new Exception('Login unsuccessful.', self::CODE_LOGIN_ERROR);
 
         $this->loggedIn = TRUE;
     }
