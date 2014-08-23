@@ -39,6 +39,7 @@ final class DropboxUploader {
     const DROPBOX_UPLOAD_LIMIT_IN_BYTES = 314572800;
     const HTTPS_DROPBOX_COM_HOME        = 'https://www.dropbox.com/home';
     const HTTPS_DROPBOX_COM_LOGIN       = 'https://www.dropbox.com/login';
+    const HTTPS_DROPBOX_COM_AJAX_LOGIN  = 'https://www.dropbox.com/ajax_login';
     const HTTPS_DROPBOX_COM_UPLOAD      = 'https://dl-web.dropbox.com/upload';
     /**
      * DropboxUploader Error Flags and Codes
@@ -120,6 +121,7 @@ final class DropboxUploader {
         $file       = $this->curlFileCreate($source, $remoteName);
         $token      = $this->extractFormValue($data, 't');
         $subjectUid = $this->extractFormValue($data, '_subject_uid');
+        $mtime = time();
 
         $postData = array(
             'plain'        => 'yes',
@@ -127,6 +129,7 @@ final class DropboxUploader {
             'dest'         => $remoteDir,
             't'            => $token,
             '_subject_uid' => $subjectUid,
+            'mtime' => $mtime,
         );
 
         $data     = $this->request(self::HTTPS_DROPBOX_COM_UPLOAD, $postData);
@@ -180,10 +183,10 @@ final class DropboxUploader {
             'login_password' => (string) $this->password,
             't'              => $token
         );
-        $data     = $this->request(self::HTTPS_DROPBOX_COM_LOGIN, http_build_query($postData));
+        $data     = $this->request(self::HTTPS_DROPBOX_COM_AJAX_LOGIN, http_build_query($postData));
 
-        if (stripos($data, 'location: /home') === FALSE)
-            throw new Exception('Login unsuccessful.', self::CODE_LOGIN_ERROR);
+        //if (stripos($data, 'location: /home') === FALSE)
+        //    throw new Exception('Login unsuccessful.', self::CODE_LOGIN_ERROR);
 
         $this->loggedIn = TRUE;
     }
