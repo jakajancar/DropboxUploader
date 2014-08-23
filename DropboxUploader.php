@@ -121,6 +121,7 @@ final class DropboxUploader {
         $file       = $this->curlFileCreate($source, $remoteName);
         $token      = $this->extractFormValue($data, 't');
         $subjectUid = $this->extractFormValue($data, '_subject_uid');
+        $mtime = time();
 
         $postData = array(
             'plain'        => 'yes',
@@ -128,6 +129,7 @@ final class DropboxUploader {
             'dest'         => $remoteDir,
             't'            => $token,
             '_subject_uid' => $subjectUid,
+            'mtime' => $mtime,
         );
 
         $data     = $this->request(self::HTTPS_DROPBOX_COM_UPLOAD, $postData);
