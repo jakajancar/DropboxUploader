@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  *
  * @author Jaka Jancar <jaka@kubje.org> <http://jaka.kubje.org/>
- * @version 1.1.17
+ * @version 1.1.18
  * @license MIT <http://spdx.org/licenses/MIT>
  */
 final class DropboxUploader {
@@ -39,6 +39,7 @@ final class DropboxUploader {
     const DROPBOX_UPLOAD_LIMIT_IN_BYTES = 314572800;
     const HTTPS_DROPBOX_COM_HOME        = 'https://www.dropbox.com/home';
     const HTTPS_DROPBOX_COM_LOGIN       = 'https://www.dropbox.com/login';
+    const HTTPS_DROPBOX_COM_LOGINACTION = 'https://www.dropbox.com/ajax_login';
     const HTTPS_DROPBOX_COM_UPLOAD      = 'https://dl-web.dropbox.com/upload';
     /**
      * DropboxUploader Error Flags and Codes
@@ -180,9 +181,9 @@ final class DropboxUploader {
             'login_password' => (string) $this->password,
             't'              => $token
         );
-        $data     = $this->request(self::HTTPS_DROPBOX_COM_LOGIN, http_build_query($postData));
+        $data     = $this->request(self::HTTPS_DROPBOX_COM_LOGINACTION, http_build_query($postData));
 
-        if (stripos($data, 'location: /home') === FALSE)
+        if (stripos($data, '{"status": "OK", "csrf_token": "') === FALSE)
             throw new Exception('Login unsuccessful.', self::CODE_LOGIN_ERROR);
 
         $this->loggedIn = TRUE;
