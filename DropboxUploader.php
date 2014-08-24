@@ -129,6 +129,7 @@ final class DropboxUploader {
             'dest'         => $remoteDir,
             't'            => $token,
             '_subject_uid' => $subjectUid,
+            'mtime_utc'    => filemtime($source),
         );
 
         $data     = $this->request(self::HTTPS_DROPBOX_COM_UPLOAD, $postData);
