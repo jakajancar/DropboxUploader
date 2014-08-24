@@ -1,7 +1,7 @@
 {
     "name": "hakre/dropbox-uploader",
     "description": "Upload files or strings to Dropbox without the Dropbox API",
-    "version": "1.1.18",
+    "version": "1.1.19",
     "keywords": ["dropbox", "upload"],
     "homepage": "http://github.com/jakajancar/DropboxUploader",
     "license": "MIT",
