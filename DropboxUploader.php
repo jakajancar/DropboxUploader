@@ -41,6 +41,7 @@ final class DropboxUploader {
     const HTTPS_DROPBOX_COM_LOGIN       = 'https://www.dropbox.com/login';
     const HTTPS_DROPBOX_COM_LOGINACTION = 'https://www.dropbox.com/ajax_login';
     const HTTPS_DROPBOX_COM_UPLOAD      = 'https://dl-web.dropbox.com/upload';
+    const HTTPS_DROPBOX_COM_LOGOUT      = 'https://www.dropbox.com/logout';
     /**
      * DropboxUploader Error Flags and Codes
      */
@@ -189,6 +190,14 @@ final class DropboxUploader {
         $this->loggedIn = TRUE;
     }
 
+    private function logout() {
+        $data = $this->request(self::HTTPS_DROPBOX_COM_LOGOUT);
+
+        if (!empty($data) && strpos($data, 'HTTP/1.1 302 FOUND') !== FALSE) {
+            $this->loggedIn = FALSE;
+        }
+    }
+
     private function request($url, $postData = NULL) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, (string) $url);
@@ -249,6 +258,12 @@ final class DropboxUploader {
         if (!preg_match('#, "TOKEN": "([A-Za-z0-9_-]+)", #', $html, $matches))
             throw new Exception('Cannot extract login CSRF token.', self::CODE_SCRAPING_LOGIN);
         return $matches[1];
+    }
+
+    public function __destruct() {
+        if ($this->loggedIn) {
+            $this->logout();
+        }
     }
 
 }

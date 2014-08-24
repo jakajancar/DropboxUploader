@@ -78,13 +78,35 @@ class DropboxIntegrationTest extends BaseTestCase
      */
     public function testInvalidCertpathException(DropboxUploader $uploader) {
         $thrown = FALSE;
-        // provoke SSL error by using an existing but invalid certificate dir
-        $uploader->setCaCertificateDir(dirname(__FILE__));
+        // clone working uploader and provoke SSL error by using an existing but invalid certificate dir
+        $broken = clone $uploader;
+        $broken->setCaCertificateDir(dirname(__FILE__));
 
         try {
-            $uploader->uploadString('fakse', 'fake.txt', 'test/integration');
+            unset($broken);
         } catch (Exception $e) {
             $expected = "Curl error: (#60) SSL certificate problem";
+            $this->assertStringStartsWith($expected, $e->getMessage());
+            $thrown = TRUE;
+        }
+        $this->assertSame(TRUE, $thrown);
+    }
+
+    /**
+     * @test
+     * @depends testLogin
+     * @param DropboxUploader $uploader
+     */
+    public function testInvalidCertfileException(DropboxUploader $uploader) {
+        $thrown = FALSE;
+        // clone working uploader and provoke SSL error by using an existing but invalid certificate file
+        $broken = clone $uploader;
+        $broken->setCaCertificateFile(__FILE__);
+
+        try {
+            unset($broken);
+        } catch (Exception $e) {
+            $expected = "Curl error: (#77) error setting certificate verify locations";
             $this->assertStringStartsWith($expected, $e->getMessage());
             $thrown = TRUE;
         }
