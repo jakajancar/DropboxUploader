@@ -1,0 +1,21 @@
+{
+    "name": "hakre/dropbox-uploader",
+    "description": "Upload files or strings to Dropbox without the Dropbox API",
+    "version": "1.1.19",
+    "keywords": ["dropbox", "upload"],
+    "homepage": "http://github.com/jakajancar/DropboxUploader",
+    "license": "MIT",
+    "autoload": {
+        "classmap": ["DropboxUploader.php"]
+    },
+    "autoload-dev": {
+        "classmap": ["test/BaseTestCase.php"]
+    },
+    "require": {
+        "php": ">=5.2.0",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.1.*"
+    }
+}

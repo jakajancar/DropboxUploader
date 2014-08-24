@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
+         backupGlobals="false"
+         colors="false"
+         bootstrap="vendor/autoload.php"
+        >
+    <php>
+        <!--
+            Dropbox_Credential_Email, Dropbox_Credential_Password
+
+            Credentials for your Dropbox Test-Account, those are the ones you use
+            to login to the Dropbox website.
+
+            NOTE: It is highly recommended you create yourself a new test-account as
+            some tests delete existing data and you don't want that with real data.
+        -->
+        <var name="Dropbox_Credential_Email"
+             value="user@example.com" />
+        <var name="Dropbox_Credential_Password"
+             value="insert-secret-password-here" />
+
+        <!--
+            Dropbox_CaCertificateDir
+        -->
+        <var name="Dropbox_CaCertificateDir"
+             value=""/>
+
+        <!--
+            Dropbox_CaCertificateFile
+
+            CA Certificate File if not configured on your system. e.g.
+
+                "C:\Program Files\Git\bin\curl-ca-bundle.crt"
+
+            if you are using git bash under Windows.
+        -->
+        <var name="Dropbox_CaCertificateFile"
+             value=""/>
+    </php>
+
+    <testsuites>
+        <testsuite name="Integration-Tests">
+            <directory>integration</directory>
+        </testsuite>
+        <testsuite name="Unit-Tests">
+            <directory>unit</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
