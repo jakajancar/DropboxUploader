@@ -185,7 +185,7 @@ final class DropboxUploader {
         );
         $data     = $this->request(self::HTTPS_DROPBOX_COM_LOGINACTION, http_build_query($postData));
 
-        if (stripos($data, '{"status": "OK", "csrf_token": "') === FALSE)
+        if (stripos($data, '{"status": "OK",') === FALSE)
             throw new Exception('Login unsuccessful.', self::CODE_LOGIN_ERROR);
 
         $this->loggedIn = TRUE;
