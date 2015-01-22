@@ -11,6 +11,8 @@ if ($_POST) {
     require 'DropboxUploader.php';
 
     try {
+        $uploader = null;
+
         if ($_FILES['file']['error'] !== UPLOAD_ERR_OK)
             throw new Exception('File was not successfully uploaded from your computer.');
 
@@ -24,7 +26,7 @@ if ($_POST) {
         echo '<span style="color: green">File successfully uploaded to your Dropbox!</span>';
     } catch (Exception $e) {
         // Handle Upload Exceptions
-        $label = ($e->getCode() & $uploader::FLAG_DROPBOX_GENERIC) ? 'DropboxUploader' : 'Exception';
+        $label = ($uploader && $e->getCode() & $uploader::FLAG_DROPBOX_GENERIC) ? 'DropboxUploader' : 'Exception';
         $error = sprintf("[%s] #%d %s", $label, $e->getCode(), $e->getMessage());
 
         echo '<span style="color: red">Error: ' . htmlspecialchars($error) . '</span>';
