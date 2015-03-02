@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  *
  * @author Jaka Jancar <jaka@kubje.org> <http://jaka.kubje.org/>
- * @version 1.1.21
+ * @version 1.1.22
  * @license MIT <http://spdx.org/licenses/MIT>
  */
 final class DropboxUploader {
@@ -76,8 +76,9 @@ final class DropboxUploader {
      */
     public function __construct($email, $password) {
         // Check requirements
-        if (!extension_loaded('curl'))
+        if (!extension_loaded('curl')) {
             throw new Exception('DropboxUploader requires the cURL extension.', self::CODE_CURL_EXTENSION_MISSING);
+        }
 
         if (empty($email) || empty($password)) {
             throw new Exception((empty($email) ? 'Email' : 'Password') . ' must not be empty.', self::CODE_PARAMETER_TYPE_ERROR);
@@ -98,16 +99,18 @@ final class DropboxUploader {
     }
 
     public function upload($source, $remoteDir = '/', $remoteName = NULL) {
-        if (!is_file($source) or !is_readable($source))
+        if (!is_file($source) or !is_readable($source)) {
             throw new Exception("File '$source' does not exist or is not readable.", self::CODE_FILE_READ_ERROR);
+        }
 
         $filesize = filesize($source);
         if ($filesize < 0 or $filesize > self::DROPBOX_UPLOAD_LIMIT_IN_BYTES) {
             throw new Exception("File '$source' too large ($filesize bytes).", self::CODE_FILESIZE_TOO_LARGE);
         }
 
-        if (!is_string($remoteDir))
+        if (!is_string($remoteDir)) {
             throw new Exception("Remote directory must be a string, is " . gettype($remoteDir) . " instead.", self::CODE_PARAMETER_TYPE_ERROR);
+        }
 
         if (is_null($remoteName)) {
             # intentionally left blank
@@ -115,8 +118,9 @@ final class DropboxUploader {
             throw new Exception("Remote filename must be a string, is " . gettype($remoteDir) . " instead.", self::CODE_PARAMETER_TYPE_ERROR);
         }
 
-        if (!$this->loggedIn)
+        if (!$this->loggedIn) {
             $this->login();
+        }
 
         $data       = $this->request(self::HTTPS_DROPBOX_COM_HOME);
         $file       = $this->curlFileCreate($source, $remoteName);
@@ -133,8 +137,9 @@ final class DropboxUploader {
         );
 
         $data     = $this->request(self::HTTPS_DROPBOX_COM_UPLOAD, $postData);
-        if (strpos($data, 'HTTP/1.1 302 FOUND') === FALSE)
+        if (strpos($data, 'HTTP/1.1 302 FOUND') === FALSE) {
             throw new Exception('Upload failed!', self::CODE_UPLOAD_ERROR);
+        }
     }
 
     private function curlFileCreate($source, $remoteName) {
@@ -170,8 +175,9 @@ final class DropboxUploader {
 
         unlink($file);
 
-        if ($exception)
+        if ($exception) {
             throw $exception;
+        }
     }
 
     private function login() {
@@ -185,8 +191,9 @@ final class DropboxUploader {
         );
         $data     = $this->request(self::HTTPS_DROPBOX_COM_LOGINACTION, http_build_query($postData));
 
-        if (stripos($data, '{"status": "OK",') === FALSE)
+        if (stripos($data, '{"status": "OK",') === FALSE) {
             throw new Exception('Login unsuccessful.', self::CODE_LOGIN_ERROR);
+        }
 
         $this->loggedIn = TRUE;
     }
@@ -236,8 +243,9 @@ final class DropboxUploader {
 
         // Store received cookies
         preg_match_all('/Set-Cookie: ([^=]+)=(.*?);/i', $data, $matches, PREG_SET_ORDER);
-        foreach ($matches as $match)
+        foreach ($matches as $match) {
             $this->cookies[$match[1]] = $match[2];
+        }
 
         return $data;
     }
@@ -249,16 +257,30 @@ final class DropboxUploader {
             , preg_quote($action, '/')
             , preg_quote($name, '/')
         );
-        if (!preg_match($pattern, $html, $matches))
+        if (!preg_match($pattern, $html, $matches)) {
             throw new Exception(sprintf("Cannot extract '%s'! (form action is '%s')", $name, $action), self::CODE_SCRAPING_FORM);
+        }
+
         return $matches[1];
     }
 
     private function extractTokenFromLoginForm($html) {
-        // , "TOKEN": "gCvxU6JVukrW0CUndRPruFvY",
-        if (!preg_match('#, "TOKEN": "([A-Za-z0-9_-]+)", #', $html, $matches))
+        $pattern = '~
+            (?J)
+            # HEADER cookie: set-cookie: js_csrf=JDAyWg55Y_xItHN_LB8KJ3d5; Domain=
+            set-cookie:\ js_csrf=(?P<token>[A-Za-z0-9_-]+);\ Domain=
+
+            # HTML: <input type="hidden" name="t" value="UJygzfv9DLLCS-is7cLwgG7z" />
+            |<input\ type="hidden"\ name="t"\ value="(?P<token>[A-Za-z0-9_-]+)"\ />
+
+            # JSON: , "TOKEN": "gCvxU6JVukrW0CUndRPruFvY",
+            |,\ "TOKEN":\ "(?P<token>[A-Za-z0-9_-]+)",\
+        ~x';
+        if (!preg_match($pattern, $html, $matches)) {
             throw new Exception('Cannot extract login CSRF token.', self::CODE_SCRAPING_LOGIN);
-        return $matches[1];
+        }
+
+        return $matches['token'];
     }
 
     public function __destruct() {
